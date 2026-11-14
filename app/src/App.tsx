@@ -37,7 +37,7 @@ export default function App() {
       <Page>
         <h1 className="mt-10 text-title font-bold">Supabaseの設定がまだです</h1>
         <p className="mt-4 text-body text-sub">
-          .env.example を .env にコピーして、VITE_SUPABASE_URL と VITE_SUPABASE_ANON_KEY を入れてから開き直してください。手順はREADMEにあります。
+          src/config.ts の supabaseUrl と supabaseAnonKey に Supabase の Project URL と anon public キーを書いて、もう一度デプロイしてください。手順はREADMEにあります。
         </p>
       </Page>
     )

@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
+import { config } from '@/config'
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+const url = config.supabaseUrl
+const anonKey = config.supabaseAnonKey
 
 export const isConfigured = Boolean(url && anonKey)
 

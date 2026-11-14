@@ -110,24 +110,35 @@ supabase functions deploy morning-push --no-verify-jwt
 
 ### 5. アプリを動かす
 
+`src/config.ts` の `PUBLIC_CONFIG` に、次の3つを書きます（どれも公開してよい値なので、コードに書いて問題ありません。こうすると Vercel などで環境変数を設定しなくても動きます）。
+
+```ts
+export const PUBLIC_CONFIG = {
+  supabaseUrl: 'https://xxxxxxxx.supabase.co',
+  supabaseAnonKey: 'eyJ...',      // anon public キー（service_role は絶対に書かない）
+  vapidPublicKey: 'B...',         // 手順2の公開鍵
+}
+```
+
 ```bash
-cp .env.example .env    # 中身を自分の値にする
 npm install
 npm run dev
 ```
 
-| 環境変数 | 場所 | 中身 |
+`.env`（`.env.example` をコピー）や公開先の環境変数に `VITE_SUPABASE_URL` などを設定した場合は、そちらが `src/config.ts` より優先されます。
+
+| 設定 | 場所 | 中身 |
 | --- | --- | --- |
-| `VITE_SUPABASE_URL` | `.env` | Project Settings > API の Project URL |
-| `VITE_SUPABASE_ANON_KEY` | `.env` | Project Settings > API の anon public キー |
-| `VITE_VAPID_PUBLIC_KEY` | `.env` | 手順2の公開鍵 |
+| `supabaseUrl` | `src/config.ts`（または `VITE_SUPABASE_URL`） | Project Settings > API の Project URL |
+| `supabaseAnonKey` | `src/config.ts`（または `VITE_SUPABASE_ANON_KEY`） | Project Settings > API の anon public キー |
+| `vapidPublicKey` | `src/config.ts`（または `VITE_VAPID_PUBLIC_KEY`） | 手順2の公開鍵 |
 | `ANTHROPIC_API_KEY` | Supabase secrets | Claude APIのキー（ブラウザには出さない） |
 | `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` | Supabase secrets | 通知の送信用 |
 | `CRON_SECRET` | Supabase secrets と cron.sql | 定期実行の合言葉 |
 
 ### 6. スマホで使う（公開）
 
-通知はHTTPSでしか動かないので、`npm run build` の `dist` を Vercel や Netlify などで公開します（`vercel.json` と `public/_redirects` で、どのURLを開いても画面が出るようにしてあります）。公開先で `.env` と同じ3つの環境変数を設定してください。
+通知はHTTPSでしか動かないので、`npm run build` の `dist` を Vercel や Netlify などで公開します（`vercel.json` と `public/_redirects` で、どのURLを開いても画面が出るようにしてあります）。`src/config.ts` に値を書いていれば、公開先で環境変数を設定する必要はありません。
 
 iPhoneでは、Safariの共有ボタンから「ホーム画面に追加」し、ホーム画面のアイコンから開いたときだけ通知が届きます（iOS 16.4以上）。
 
