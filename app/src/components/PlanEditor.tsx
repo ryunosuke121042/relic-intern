@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { api } from '@/lib/api'
+import { isLocalMode } from '@/lib/repository'
 import { mdLabel, shortLabel } from '@/lib/date'
 import { cn } from '@/lib/utils'
 import type { AdjustAction, PlanInput, TaskDraft } from '@/types'
@@ -122,7 +123,7 @@ export function PlanEditor({ input, tasks, onChange, range, showFrom, showTo, ma
       <Dialog open={selected !== null} onOpenChange={(v) => !v && !busy && setSelected(null)}>
         <DialogContent>
           <DialogTitle>{selected && shortLabel(selected)}の予定</DialogTitle>
-          <DialogDescription>選ぶと、この日の分だけAIが作り直します。</DialogDescription>
+          <DialogDescription>選ぶと、この日の分だけ{isLocalMode ? '' : 'AIが'}作り直します。</DialogDescription>
           <div className="mt-5 grid gap-3">
             {ACTIONS.map(({ action, label }) => (
               <Button

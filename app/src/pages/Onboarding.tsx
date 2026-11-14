@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BackLink, Page } from '@/components/Page'
 import { api } from '@/lib/api'
+import { isLocalMode } from '@/lib/repository'
 import { addDays, shortLabel, today as getToday, WEEKDAYS } from '@/lib/date'
 import { saveDraft } from '@/lib/draft'
 import { cn } from '@/lib/utils'
@@ -74,7 +75,7 @@ export default function Onboarding() {
       .map((q, i) => `${q.question}：${answers[i]?.trim() || '特になし'}`)
       .join('\n')
     const full = { ...input, notes }
-    setLoading('AIが計画の案を作っています')
+    setLoading(isLocalMode ? '計画の案を作っています' : 'AIが計画の案を作っています')
     setError(null)
     try {
       const res = await api.generatePlan(full, today)
@@ -242,6 +243,9 @@ export default function Onboarding() {
             ))}
             {loading === 'AIが計画の案を作っています' && (
               <p className="mt-6 text-body text-sub" role="status">{loading}。30秒ほどかかります</p>
+            )}
+            {loading === '計画の案を作っています' && (
+              <p className="mt-6 text-body text-sub" role="status">{loading}</p>
             )}
             {error && <p className="mt-6 text-body text-late" role="alert">{error}</p>}
           </div>
