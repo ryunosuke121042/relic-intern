@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { Loading, Page } from '@/components/Page'
-import { isConfigured } from '@/lib/supabase'
+import { isLocalMode } from '@/lib/repository'
 import { ensureUser, savePlan } from '@/lib/repository'
 import { buildSample } from '@/lib/sample'
 import { today } from '@/lib/date'
@@ -16,7 +16,6 @@ export default function App() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!isConfigured) return
     ;(async () => {
       try {
         const { isNew } = await ensureUser()
@@ -32,22 +31,14 @@ export default function App() {
     })()
   }, [])
 
-  if (!isConfigured) {
-    return (
-      <Page>
-        <h1 className="mt-10 text-title font-bold">Supabaseの設定がまだです</h1>
-        <p className="mt-4 text-body text-sub">
-          src/config.ts の supabaseUrl と supabaseAnonKey に Supabase の Project URL と anon public キーを書いて、もう一度デプロイしてください。手順はREADMEにあります。
-        </p>
-      </Page>
-    )
-  }
   if (error) {
     return (
       <Page>
         <h1 className="mt-10 text-title font-bold">起動できませんでした</h1>
         <p className="mt-4 text-body text-sub">{error}</p>
-        <p className="mt-2 text-body text-sub">Supabaseで匿名ログインが有効になっているか確認してください。</p>
+        {!isLocalMode && (
+          <p className="mt-2 text-body text-sub">Supabaseで匿名ログインが有効になっているか確認してください。</p>
+        )}
       </Page>
     )
   }

@@ -7,6 +7,17 @@
 検証したいこと：組み込み作業がなくなれば、モチベーションが下がっていても翌日また30分に戻れるか。
 判定ルール：2日以上予定どおりにできなかったとき、組み直しを確定してから7日以内に、予定のある日で3回連続できたら「戻れた」。結果は `/log` で見られます。
 
+## Supabaseなしで動かす（お試し版）
+
+`src/config.ts` に Supabase の設定がないときは、自動で「お試し版」として動きます。Vercel などにそのまま公開するだけで使えます。
+
+- 記録はその端末のブラウザ（localStorage）にだけ保存されます。別の端末とは共有されず、ブラウザのデータを消すと消えます
+- AIは使いません。計画の案・日ごとの直し・組み直しは、ルールで作ります（`src/lib/backend/localApi.ts`）
+- 「計画全体への頼みごと」は「土曜は休み」のような曜日の指定だけ使えます
+- 通知は使えません（アプリを開いたときに組み直し案を出します）
+
+Supabase の設定を書くと、AIと通知が使える完全版に切り替わります（お試し版のデータは引き継がれません）。
+
 ## ページ構成
 
 | パス | 画面 | やること |
@@ -32,9 +43,11 @@ src/
     PlanEditor.tsx           日付ごとの予定リストと部分修正（/plan と /replan で共通）
     NotificationSetup.tsx    ホーム画面への追加と通知許可の案内
   pages/                     Today, Onboarding, PlanPage, Replan, Log
+  config.ts                  公開してよい設定（Supabaseの接続先など）。空ならお試し版で動く
   lib/
-    repository.ts            保存と読み込み（画面からSupabaseを直接触らない）
-    api.ts                   Edge Functions（AI）の呼び出し
+    repository.ts            保存と読み込みの入口（Supabaseか端末内かを切り替える）
+    api.ts                   計画づくり・組み直しの入口（AIかルールかを切り替える）
+    backend/                 supabaseRepository / supabaseApi（完全版）、localRepository / localApi（お試し版）
     logic.ts                 崩れの判定・組み直しの範囲・ルールでの組み直し・予定のチェック
     verification.ts          「戻れた」の判定
     push.ts                  通知の許可と登録
@@ -161,4 +174,4 @@ iPhoneでは、Safariの共有ボタンから「ホーム画面に追加」し�
 
 ## Supabase以外に移すとき
 
-画面は `src/lib/repository.ts`（保存と読み込み）と `src/lib/api.ts`（AI）しか呼ばないので、この2つを差し替えれば画面はそのまま使えます。
+画面は `src/lib/repository.ts`（保存と読み込み）と `src/lib/api.ts`（AI）しか呼ばないので、`src/lib/backend/` に同じ形の実装を足して切り替えれば、画面はそのまま使えます。

@@ -18,6 +18,7 @@ import {
   listPlanTasks,
   markOverdueMissed,
   setTaskStatus,
+  isLocalMode,
 } from '@/lib/repository'
 import type { Plan, Replan, Task, TaskStatus } from '@/types'
 
@@ -34,7 +35,7 @@ export default function Today() {
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [replanning, setReplanning] = useState(false)
-  const [setupOpen, setSetupOpen] = useState(params.get('setup') === '1')
+  const [setupOpen, setSetupOpen] = useState(!isLocalMode && params.get('setup') === '1')
   const today = getToday()
 
   const load = useCallback(async () => {
@@ -121,7 +122,9 @@ export default function Today() {
         <p className="mt-6 text-body text-sub">{longLabel(today)}</p>
         <h1 className="mt-10 text-hero font-black">まずは目標を教えてください</h1>
         <p className="mt-4 text-body text-sub">
-          いくつかの質問に答えると、AIと一緒に毎日の計画を作れます。崩れたときは、遅れた分をAIが組み直します。
+          {isLocalMode
+            ? 'いくつかの質問に答えると、毎日の計画を作れます。崩れたときは、遅れた分を自動で組み直します。'
+            : 'いくつかの質問に答えると、AIと一緒に毎日の計画を作れます。崩れたときは、遅れた分をAIが組み直します。'}
         </p>
       </Page>
     )
@@ -172,6 +175,7 @@ export default function Today() {
       <nav aria-label="メニュー" className="-mx-2 mt-2 flex flex-wrap">
         <NavItem to="/plan" icon={<CalendarDays className="h-5 w-5" aria-hidden />} label="計画" />
         <NavItem to="/log" icon={<ClipboardList className="h-5 w-5" aria-hidden />} label="検証記録" />
+        {!isLocalMode && (
         <button
           onClick={() => setSetupOpen(true)}
           className="inline-flex min-h-tap items-center gap-1.5 rounded-2xl px-2 text-note text-sub hover:text-fg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent/60"
@@ -179,7 +183,13 @@ export default function Today() {
           <Bell className="h-5 w-5" aria-hidden />
           通知
         </button>
+        )}
       </nav>
+      {isLocalMode && (
+        <p className="mt-2 text-note text-sub">
+          お試し版：記録はこの端末のブラウザにだけ保存されます。AIと通知は使えず、組み直しはルールで行います。
+        </p>
+      )}
 
       {plan.is_sample && (
         <Card className="mt-4">
